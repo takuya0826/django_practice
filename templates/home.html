@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block header %}
+
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+
+<div class="header_btn">
+    <button class="btn btn-outline-primary"><i class="bi bi-person-plus"></i> ユーザ登録</button>
+    <button class="btn btn-outline-success"><i class="bi bi-clock-history"></i> 勤怠履歴</button>
+</div>
+
+{% endblock header%}
+
+{% block content %}
+<table class="table">
+    <tr>
+        <th></th>
+        <th></th>
+        <th>出勤</th>
+        <th>退勤</th>
+    </tr>
+
+    {% for user in object_list %}
+    <tr>
+        <td>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                data-bs-target="#input_btn_modal_{{forloop.counter}}">
+                <i class="bi bi-person-fill"></i> {{user}}
+            </button>
+        </td>
+        <td>{{user.comment|default:''}}</td>
+
+        <td><a href="#" data-bs-toggle="modal"
+            data-bs-target="#workstart_revise_modal_{{forloop.counter}}">
+            {{user.start_work_time|date:"H:i"|default:''}}</a></td>
+
+        <td><a href="#">{{user.end_work_time|date:"H:i"|default:''}}</a></td>
+    </tr>
+    <!-- Modal定義 ユーザボタン画面-->
+    <div class="modal fade" id="input_btn_modal_{{forloop.counter}}" tabindex="-1"
+        aria-labelledby="exampleModalLabel_{{forloop.counter}}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel_{{forloop.counter}}">{{user}} さん</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{% url 'cmnt_update' user.id %}" method="post">{% csrf_token %}
+                        <textarea name="comment" class="form-control" rows="3">{{user.comment}}</textarea>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success btn-lg btn-block"><i class="bi bi-pencil"></i> 伝言投稿</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div class="work_action_btn">
+                        {% if user.start_work_time is None %}
+                        <form action="{% url 'regist_workstart' user.id %}" method="post" style="display:inline;">{%
+                            csrf_token %}
+                            <button class="btn btn-primary btn-block"><i class="bi bi-person-workspace"></i> 出勤</button>
+                        </form>
+                        {% endif %}
+                        {% if user.start_work_time is not None %}
+                        <form action="{% url 'regist_workend' user.work_time_id %}" method="post"
+                            style="display:inline;">{% csrf_token %}
+                            <button class="btn btn-danger btn-block"><i class="bi bi-box-arrow-right"></i> 退勤</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 出勤時刻訂正ボタン-->
+    <div class="modal fade" id="workstart_revise_modal_{{forloop.counter}}" tabindex="-1"
+        aria-labelledby="workstart_revise_modallabel_{{forloop.counter}}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel_{{forloop.counter}}">{{user}} さん</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <div class="work_action_btn">
+                    </div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% endfor %}
+</table>
+
+
+{% endblock content%}
