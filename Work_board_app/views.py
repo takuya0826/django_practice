@@ -41,7 +41,13 @@ class Workstart_register_view(ListView):
 
     def post(self, request, *args, **kwargs):
         customuser = CustomUser.objects.get(id=self.kwargs['pk'])
-        Work_time.objects.create(attendance_date=TODAY_DATE, start_work_time=TODAY_DATETIME, target_user=customuser)
+        work_time = Work_time.objects.filter(attendance_date=TODAY_DATE, start_work_time=TODAY_DATETIME, target_user=customuser)
+        
+        if work_time.exists():
+            pass
+        else:
+            Work_time.objects.create(attendance_date=TODAY_DATE, start_work_time=TODAY_DATETIME, target_user=customuser)
+ 
         return self.get(request, *args, **kwargs)
     
     def get_queryset(self):

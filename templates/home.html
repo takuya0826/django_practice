@@ -16,27 +16,27 @@
 <table class="table">
     <tr>
         <th></th>
-        <th></th>
         <th>出勤</th>
         <th>退勤</th>
     </tr>
 
     {% for user in object_list %}
     <tr>
-        <td>
+        <td class="work_timeinfo">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                 data-bs-target="#input_btn_modal_{{forloop.counter}}">
                 <i class="bi bi-person-fill"></i> {{user}}
             </button>
         </td>
-        <td>{{user.comment|default:''}}</td>
-
-        <td><a href="#" data-bs-toggle="modal"
-            data-bs-target="#workstart_revise_modal_{{forloop.counter}}">
-            {{user.start_work_time|date:"H:i"|default:''}}</a></td>
-
-        <td><a href="#">{{user.end_work_time|date:"H:i"|default:''}}</a></td>
+        <td class="work_timeinfo"><a href="#" data-bs-toggle="modal" data-bs-target="#workstart_revise_modal_{{forloop.counter}}">
+                {{user.start_work_time|date:"H:i"|default:''}}</a></td>
+        <td class="work_timeinfo"><a href="#">{{user.end_work_time|date:"H:i"|default:''}}</a></td>
     </tr>
+    {% if user.comment is not None %}
+    <tr class="user_comment_field">
+        <td colspan="3">{{user.comment}}</td>
+    </tr>
+    {% endif %}
     <!-- Modal定義 ユーザボタン画面-->
     <div class="modal fade" id="input_btn_modal_{{forloop.counter}}" tabindex="-1"
         aria-labelledby="exampleModalLabel_{{forloop.counter}}" aria-hidden="true">
@@ -57,8 +57,8 @@
                 <div class="modal-footer">
                     <div class="work_action_btn">
                         {% if user.start_work_time is None %}
-                        <form action="{% url 'regist_workstart' user.id %}" method="post" style="display:inline;">{%
-                            csrf_token %}
+                        <form action="{% url 'regist_workstart' user.id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
                             <button class="btn btn-primary btn-block"><i class="bi bi-person-workspace"></i> 出勤</button>
                         </form>
                         {% endif %}
@@ -80,15 +80,17 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel_{{forloop.counter}}">{{user}} さん</h5>
+                    <h5 class="modal-title" id="workstart_revise_modallabel_{{forloop.counter}}">出勤時刻修正({{user}})</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-
+                    <p>修正後は(編集済)と記載されます。</p>
+                    <input type="time">
                 </div>
                 <div class="modal-footer">
                     <div class="work_action_btn">
                     </div>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">確定する</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
                 </div>
             </div>

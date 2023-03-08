@@ -4,3 +4,10 @@
     left: 70px;
 }
 
+td.work_timeinfo {
+    border: 0;
+}
+
+tr.user_comment_field {
+    background: #FFFFCC;
+}
